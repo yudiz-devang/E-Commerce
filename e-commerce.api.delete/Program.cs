@@ -1,9 +1,5 @@
 using ecommerce.repository;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,17 +9,6 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy(
-        "CorsPolicy",
-        builder => builder
-        .AllowAnyMethod()
-        .AllowAnyHeader()
-        .SetIsOriginAllowed((host) => true)
-        .AllowCredentials());
-}); builder.Services.AddEndpointsApiExplorer();
-
 builder.Services.AddDbContext<EcommerceContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DatabaseConnection"));
@@ -36,12 +21,21 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseSwagger(c =>
+    {
+        c.RouteTemplate = "MyTestService/swagger/{documentName}/swagger.json";
+    });
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/MyTestService/swagger/v1/swagger.json", "TestService");
+        c.RoutePrefix = "MyTestService/swagger";
+    });
 }
-app.UseRouting();
-app.UseHttpsRedirection();
-app.UseCors("CorsPolicy");
-app.UseAuthorization();
 
+app.UseHttpsRedirection();
+
+app.UseAuthorization();
+app.UseDeveloperExceptionPage();
 app.MapControllers();
 
 app.Run();

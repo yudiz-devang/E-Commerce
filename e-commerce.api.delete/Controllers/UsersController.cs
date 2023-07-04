@@ -23,14 +23,14 @@ namespace e_commerce.api.Controllers
 
         #region 1. User Sign in 
 
-        [AllowAnonymous,HttpPost(ActionConsts.User.UserSignIn)]
+        [AllowAnonymous, HttpPost(ActionConsts.User.UserSignIn)]
         public async Task<IActionResult> UserLoginAsync([FromBody] UserSigninReqeust reqeust)
         {
-            if (reqeust == null)  new UserSigninReqeust();
+            if (reqeust == null) new UserSigninReqeust();
 
             if (!ModelState.IsValid) return this.ErrorResponse(this.ModelState);
 
-            using var helper = new UserHelper(this.context,this.Crypto,this.Mapper);
+            using var helper = new UserHelper(this.context, this.Crypto, this.Mapper);
 
             reqeust.UniqueId = Guid.NewGuid().ToString();
 

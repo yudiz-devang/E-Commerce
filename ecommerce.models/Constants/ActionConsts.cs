@@ -13,6 +13,7 @@ namespace ecommerce.models.Constants
         public class User
         {
             public const string UserSignIn = "user/sign_in";
+            public const string UserSignUp = "user/sign_up";
         }
     }
 }

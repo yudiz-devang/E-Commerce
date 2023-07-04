@@ -19,5 +19,7 @@ namespace ecommerce.models.Response
         public string? State { get; set; }
         public string? City { get; set; }
         public string? Image { get; set; }
+
+        public string? Token { get; set; }
     }
 }

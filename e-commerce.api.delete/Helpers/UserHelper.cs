@@ -1,40 +1,43 @@
-﻿using ecommerce.models.Request.User;
-using ecommerce.models.Response.Base;
-using ecommerce.repository;
-using ecommerce.security;
-using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
-using System.Linq;
+﻿using AutoMapper;
 
 namespace e_commerce.api.Helpers
 {
     public class UserHelper : IDisposable
     {
+        #region  Constructor
         private EcommerceContext Dbcontext { get; set; }
-       
+        private ICrypto Crypto { get; set; }
+        public IMapper Mapper { get; set; }
 
-        public UserHelper(EcommerceContext _context)
-        {
-            this.Dbcontext = _context;
-          
-        }
 
-        #region User Sign In
+        public UserHelper(EcommerceContext _context,ICrypto _crypto,IMapper mapper)
+            {
+                 this.Dbcontext = _context;
+                 this.Crypto = _crypto;
+                 this.Mapper = mapper;
+            }
+
+        #endregion
+
+        #region 1. User Signin 
+        
         public async Task<BaseResponse> Login(UserSigninReqeust reqeust)
         {
             try
             {
-               
+                //Encrypt Password
+                var password = this.Crypto.EncryptPassword(reqeust.Password);
+
                 //Check Username
 
-                if (!this.Dbcontext.Users.Any(x => x.EmailId.Equals(reqeust.EmailId.ToLower()) || !x.Deleted))
-                    return await Task.FromResult(new BaseResponse { IsSuccess = false, ErrorMessage = "Invalid Email address & passowrd" });
+                if(!this.Dbcontext.Users.Any(x=>x.EmailId.Equals(reqeust.EmailId.ToLower()) || x.Password.Equals(password) && !x.Deleted)) 
+                    return await Task.FromResult(new BaseResponse { IsSuccess = false , ErrorMessage = "Invalid Email address & passowrd"});
 
                 if (!this.Dbcontext.Users.Any(x => x.EmailId.Equals(reqeust.EmailId.ToLower()) && !x.Deleted))
                     return await Task.FromResult(new BaseResponse { IsSuccess = false, ErrorMessage = "error_account_notfoud" });
 
-                var users = await Dbcontext.Users.FirstOrDefaultAsync(x => x.EmailId.Equals(reqeust.EmailId.ToLower()) &&
-                x.Password.Equals(reqeust.Password) &&
+                var users = await Dbcontext.Users.FirstOrDefaultAsync(x=>x.EmailId.Equals(reqeust.EmailId.ToLower()) &&
+                x.Password.Equals(reqeust.Password) &&  
                 !x.Deleted);
 
                 if (!users.Active)
@@ -70,8 +73,7 @@ namespace e_commerce.api.Helpers
 
                 return await Task.FromResult(new BaseResponse { IsSuccess = true, Data = JsonConvert.SerializeObject(response) });
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 return await Task.FromResult(new BaseResponse
                 {
                     IsSuccess = false,
@@ -80,8 +82,13 @@ namespace e_commerce.api.Helpers
                 });
             }
         }
+        public void Dispose() => GC.SuppressFinalize(this);
+
+
         #endregion
 
-        public void Dispose() => GC.SuppressFinalize(this);
+        #region User SignUp
+        
+        #endregion
     }
 }
