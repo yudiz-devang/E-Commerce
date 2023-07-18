@@ -54,5 +54,7 @@ namespace ecommerce.models.Entities
 
         public bool? IsAdmin { get; set; }
 
+        public Guid? UniqueId { get; set; }
+
     }
 }
