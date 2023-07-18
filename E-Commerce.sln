@@ -15,9 +15,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "e-commerce.admin", "e-comme
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ecommerce.security", "ecommerce.security\ecommerce.security.csproj", "{BEA75AED-1FEA-4EB9-AEE0-21B480EFAFD3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "e-commerce.api", "e-commerce.api\e-commerce.api.csproj", "{5A580000-D814-43E8-A1D1-B6CC574C3004}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "e-commerce.api", "e-commerce.api\e-commerce.api.csproj", "{5A580000-D814-43E8-A1D1-B6CC574C3004}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "e-commerce.client", "e-commerce.client\e-commerce.client.csproj", "{4335FE8A-8C4B-45BA-B54B-CB33C6162C2C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "e-commerce.client", "e-commerce.client\e-commerce.client.csproj", "{4335FE8A-8C4B-45BA-B54B-CB33C6162C2C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

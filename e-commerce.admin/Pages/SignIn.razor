@@ -1,0 +1,43 @@
+﻿@using Newtonsoft.Json;
+@using e_commerce.admin.Helper;
+@using e_commerce.admin.Model.Const;
+@using e_commerce.admin.Model.Request;
+@using e_commerce.admin.Model.Response;
+@layout LoginLayout
+@inject NavigationManager NavManager
+
+<div class="card">
+    <h4 class="card-header">Login</h4>
+    <div class="card-body">
+        <form Model="" OnValidSubmit="">
+            <DataAnnotationsValidator />
+            <div class="form-group">
+                <label>Username</label>
+                <InputText  class="form-control" />
+                @*<ValidationMessage For="@(() => loginRequest.EmailId)" />*@
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <InputText @*@bind-Value="loginRequest.Password"*@ type="password" class="form-control" />
+                @*<ValidationMessage For="@(() => loginRequest.Password)" />*@
+            </div>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+</div>
+
+
+@code {
+    LoginRequest loginRequest = new LoginRequest();
+
+    private async Task OnValidSubmit()
+    {
+        var result = await AccountHelpers.LoginAPI(loginRequest);
+        if (result.meta.statusCode == StatusCodeConsts.Success)
+        {
+            var response = JsonConvert.DeserializeObject<LoginResponse>(result.data);
+            //await localStorage.SetItemAsync("token", response.Token);
+            //await localStorage.SetItemAsync("userId", response.Id);
+        }
+    }
+}

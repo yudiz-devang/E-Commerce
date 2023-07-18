@@ -52,5 +52,7 @@ namespace ecommerce.models.Entities
 
         public string? Paymenttype { get; set; }
 
+        public bool? IsAdmin { get; set; }
+
     }
 }

@@ -1,47 +1,36 @@
-﻿using Azure.Core;
-using ecommerce.models.Entities;
+﻿using ecommerce.models.Request.Admin;
 using ecommerce.models.Request.User;
-using ecommerce.models.Response;
 using ecommerce.models.Response.Base;
-using ecommerce.models.Response.User;
 using ecommerce.repository;
-using ecommerce.security;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using System.Linq;
-using static e_commerce.api.Filter.ExceptionFilter;
 
 namespace e_commerce.api.Helpers
 {
-    public class UserHelper : IDisposable
+    public class AdminHelpers : IDisposable
     {
+
         private EcommerceContext Dbcontext { get; set; }
-        private ICrypto Crypto { get; set; }
 
-
-        public UserHelper(EcommerceContext _context, ICrypto Crypto)
+        public AdminHelpers(EcommerceContext _context)
         {
             this.Dbcontext = _context;
-            this.Crypto = Crypto;
         }
 
-        #region User Sign In
+        #region Admin Sign In 
         public async Task<BaseResponse> Login(UserSigninReqeust reqeust)
         {
             try
             {
-
-                //Check Username
-
-                if (!this.Dbcontext.Users.Any(x => x.EmailId.Equals(reqeust.EmailId.ToLower()) || !x.Deleted))
+                if (!this.Dbcontext.Users.Any(x => x.EmailId.Equals(reqeust.EmailId.ToLower()) || !x.Deleted || x.IsAdmin == true))
                     return await Task.FromResult(new BaseResponse { IsSuccess = false, ErrorMessage = "Invalid Email address & passowrd" });
 
-                if (!this.Dbcontext.Users.Any(x => x.EmailId.Equals(reqeust.EmailId.ToLower()) && !x.Deleted))
+                if (!this.Dbcontext.Users.Any(x => x.EmailId.Equals(reqeust.EmailId.ToLower()) || !x.Deleted || x.IsAdmin == true))
                     return await Task.FromResult(new BaseResponse { IsSuccess = false, ErrorMessage = "error_account_notfoud" });
 
                 var users = await Dbcontext.Users.FirstOrDefaultAsync(x => x.EmailId.Equals(reqeust.EmailId.ToLower()) &&
                 x.Password.Equals(reqeust.Password) &&
-                !x.Deleted);
+                !x.Deleted && x.IsAdmin == true);
 
                 if (!users.Active)
                     return await Task.FromResult(new BaseResponse { IsSuccess = false, ErrorMessage = "error_user_inactive" });
@@ -55,7 +44,6 @@ namespace e_commerce.api.Helpers
 
                 users.Active = true;
                 this.Dbcontext.SaveChanges();
-
                 var response = new
                 {
                     users.Id,
@@ -72,6 +60,7 @@ namespace e_commerce.api.Helpers
                     users.MobileNumber,
                     users.BirthDate,
                     users.Address,
+                    users.IsAdmin
                 };
 
                 return await Task.FromResult(new BaseResponse { IsSuccess = true, Data = JsonConvert.SerializeObject(response) });
@@ -87,39 +76,10 @@ namespace e_commerce.api.Helpers
             }
         }
         #endregion
-        public async Task<BaseResponse> SignUp(UserSignupRequest request)
-        {
-            if (this.Dbcontext.Users.Any(x => x.EmailId == request.EmailId))
-                throw new ApiException("error_email_exists");
-            
-            await this.Dbcontext.AddAsync(new UsersEntity
-            {
-                FirstName = request.FirstName,
-                LastName = request.LastName,
-                EmailId = request.EmailId,
-                Password = request.Password,
-                Address = request.Address,
-                BirthDate = request.BirthDate,
-                City = request.City,
-                Image = request.Image,
-                ZipCode = request.ZipCode,
-                MobileNumber = request.MobileNumber,
-                Created = DateTime.UtcNow,
-                Modified = DateTime.UtcNow,
-                Paymenttype = request.Paymenttype,
-                IsAdmin = request.IsAdmin,
-                Active = true,
-                Deleted = false,
-                State = request.State,
-                ConfirmPassword = request.Password
-                
-            });
-            await this.Dbcontext.SaveChangesAsync();
-            return new BaseResponse { IsSuccess = true };
-        }
-        #region User Sign up
 
-        #endregion
         public void Dispose() => GC.SuppressFinalize(this);
     }
 }
+
+
+
